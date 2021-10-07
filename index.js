@@ -53,7 +53,7 @@ pool.query('SELECT '+
                   ' ON st.id = ct.state_id '+
                 ' WHERE '+
                 ' c.judicial_process_exists = false AND '+
-                'c.status in (\'service_provision\', \'reduction\') AND'+
+                'c.status in (\'service_provision\', \'reduction\') AND '+
                 'c.active = true', (err, res) => {
 
   //console.log(res);
