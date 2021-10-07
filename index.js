@@ -53,7 +53,8 @@ pool.query('SELECT '+
                   ' ON st.id = ct.state_id '+
                 ' WHERE '+
                 ' c.judicial_process_exists = false AND '+
-                'c.status in (\'service_provision\', \'reduction\')', (err, res) => {
+                'c.status in (\'service_provision\', \'reduction\')'+
+                'c.active = true', (err, res) => {
 
   //console.log(res);
   res.rows.forEach(function(row){
@@ -61,7 +62,7 @@ pool.query('SELECT '+
     var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 
     var params = {
-      MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf, "contract_id": row.id_contract}),
+      MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf_novo, "contract_id": row.id_contract}),
       QueueUrl: process.env.AWS_QUEUE_LOCALIZACAO
     };
     
@@ -73,9 +74,27 @@ pool.query('SELECT '+
       }
     });
 
-    if(row.uf == 'DF' || row.uf == 'GO'){
+
+    if(row.uf_novo != row.uf){
+
+        var params = {
+          MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf, "contract_id": row.id_contract}),
+          QueueUrl: process.env.AWS_QUEUE_LOCALIZACAO
+        };
+        
+        sqs.sendMessage(params, function(err, data) {
+          if (err) {
+            console.log("Error " + err);
+          } else {
+            console.log("Enviando SQS processos: " + data.MessageId);
+          }
+        });
+
+    }
+
+    if(row.uf_novo == 'DF' || row.uf_novo == 'GO'){
       var params = {
-        MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf == 'DF'? 'GO': 'DF', "contract_id": row.id_contract}),
+        MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf_novo == 'DF'? 'GO': 'DF', "contract_id": row.id_contract}),
         QueueUrl: process.env.AWS_QUEUE_LOCALIZACAO
       };
       
