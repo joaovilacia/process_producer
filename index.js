@@ -52,9 +52,17 @@ pool.query('SELECT '+
             ' LEFT JOIN states st '+
                   ' ON st.id = ct.state_id '+
                 ' WHERE '+
-                ' c.judicial_process_exists = false AND '+
+                'c.judicial_process_exists = false AND '+ 
+                'c.apprehension_search_exists = false AND '+
                 'c.status in (\'service_provision\', \'reduction\') AND '+
-                'c.active = true', (err, res) => {
+                'c.active = true '+
+                'AND c.contract_number_system is not null '+
+                'AND c.reason_termination is null '+
+                'AND c.debt_confession_date is null '+
+                'AND c.contract_rescission_date is null '+
+                'AND c.discharge_value is null '+
+                'AND c.vehicle_selled is null '+
+                'AND c.buy_date is null', (err, res) => {
 
   //console.log(res);
   res.rows.forEach(function(row){
