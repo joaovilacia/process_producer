@@ -62,7 +62,8 @@ pool.query('SELECT '+
                 'AND c.contract_rescission_date is null '+
                 'AND c.discharge_value is null '+
                 'AND c.vehicle_selled is null '+
-                'AND c.buy_date is null', (err, res) => {
+                'AND c.buy_date is null '+
+                'AND c.client_name <> \'==>> SELECIONE O CLIENTE\'', (err, res) => {
 
   //console.log(res);
   res.rows.forEach(function(row){
@@ -83,22 +84,22 @@ pool.query('SELECT '+
     });
 
 
-    if(row.uf_novo != row.uf){
+    // if(row.uf_novo != row.uf){
 
-        var params = {
-          MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf, "contract_id": row.id_contract}),
-          QueueUrl: process.env.AWS_QUEUE_LOCALIZACAO
-        };
+    //     var params = {
+    //       MessageBody: JSON.stringify({"cpf": row.cpf, "nome": row.nome, "uf": row.uf, "contract_id": row.id_contract}),
+    //       QueueUrl: process.env.AWS_QUEUE_LOCALIZACAO
+    //     };
         
-        sqs.sendMessage(params, function(err, data) {
-          if (err) {
-            console.log("Error " + err);
-          } else {
-            console.log("Enviando SQS processos: " + data.MessageId);
-          }
-        });
+    //     sqs.sendMessage(params, function(err, data) {
+    //       if (err) {
+    //         console.log("Error " + err);
+    //       } else {
+    //         console.log("Enviando SQS processos: " + data.MessageId);
+    //       }
+    //     });
 
-    }
+    // }
 
     if(row.uf_novo == 'DF' || row.uf_novo == 'GO'){
       var params = {
